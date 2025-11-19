@@ -1,20 +1,24 @@
 import { createServer } from "node:http";
 
-const server = createServer((request, response) => {
-  response.statusCode = 200;
-  response.setHeader('Content-Type', 'text/html');
+const server = createServer((req, res) => {
+  res.statusCode = 200;
+  res.setHeader('Content-Type', 'text/html');
+  const url = new URL(req.url, 'http://localhost')
+  const cor = url.searchParams.get('cor')
+  const tamanho = url.searchParams.get('tamanho')
   
-  if(request.method === 'GET' && request.url === '/'){
-    response.statusCode = 200;
-    response.end('Home');
-  } else if(request.method === 'POST' && request.url === '/produtos'){
-    response.statusCode = 201;
-    response.end('Produtos');
+  
+  if(req.method === 'GET' && url.pathname === '/'){
+    res.statusCode = 200;
+    res.end('Home');
+  } else if(req.method === 'POST' && url.pathname === '/produtos'){
+    res.statusCode = 201;
+    res.end(`Produtos: ${cor}, ${tamanho}`);
   }else {
-    response.statusCode = 404;
-    response.end('Pagina não encontrada');
+    res.statusCode = 404;
+    res.end('Pagina não encontrada');
   }
-  console.log(request.method);
+  console.log(req.method);
 });
 
 server.listen(3000, () => {
