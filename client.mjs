@@ -1,5 +1,5 @@
 
-const response = await fetch('http://localhost:3000/produto/notebook', {
+const response = await fetch('http://localhost:3000/sobre', {
   method: 'GET',
   // headers: {
   //   'Content-Type': 'application/json'

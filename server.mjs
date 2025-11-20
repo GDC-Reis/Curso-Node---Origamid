@@ -1,5 +1,21 @@
 import { createServer } from "node:http";
-import { routes } from "./router.mjs";
+import { Router } from "./router.mjs";
+
+const router = new Router();
+
+router.get('/', (req, res) => {
+  res.end('Home');
+});
+
+router.get('/produto/notebook', (req, res) => {
+  res.end('Produtos - Notebook')
+});
+
+// Também pode ser usado dessa maneira
+function postProduto(req, res){
+  res.end('Notebook Post');
+}
+router.post('/produto', postProduto);
 
 const server = createServer( async (req, res) => {
   const url = new URL(req.url, 'http://localhost');
@@ -10,12 +26,8 @@ const server = createServer( async (req, res) => {
   }
   const body = Buffer.concat(chunks).toString('utf-8');
 
-  // Handler 
-  // Entra dentro do objeto 'routes' 
-  // Pega o método da request, exemplo 'GET', 'POST'
-  // Pega o caminho da url, exemplo '/', '/produtos', '/produto/notebook'
-  // Pegando esses parâmetros ele entra dentro do objeto e preenche os dados, como por exemplo 'Objeto: caminhão' caminhão.marca, caminhão.qtdPeneu
-  const handler = routes[req.method][url.pathname];
+  // Encontra qual rota foi recebida pelo usuário
+  const handler = router.find(req.method, url.pathname);
   if (handler){
     handler(req, res);
   }else {
