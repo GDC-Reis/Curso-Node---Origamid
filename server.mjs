@@ -1,38 +1,27 @@
 import { createServer } from "node:http";
+import { routes } from "./router.mjs";
 
 const server = createServer( async (req, res) => {
   const url = new URL(req.url, 'http://localhost');
-
-  res.setHeader('Access-Control-Allow-Headers', "Content-Type, Authorization");
   
   const chunks = [];
   for await (const chunk of req){
     chunks.push(chunk);
   }
   const body = Buffer.concat(chunks).toString('utf-8');
-  
-  if(req.method === 'GET' && url.pathname === '/'){
-    res.statusCode = 200;
-    res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    res.end(`
-        <html>
-          <head>
-            <title>Mundo</title>
-          </head>
-          <body>
-            <h1> Olá Mundo </h1>
-          </body>
-        </html>
-      `);
-  } else if(req.method === 'POST' && url.pathname === '/produtos'){
-    res.statusCode = 201;
-    res.setHeader('Content-Type', 'application/json');
-    res.end('Produtos');
+
+  // Handler 
+  // Entra dentro do objeto 'routes' 
+  // Pega o método da request, exemplo 'GET', 'POST'
+  // Pega o caminho da url, exemplo '/', '/produtos', '/produto/notebook'
+  // Pegando esses parâmetros ele entra dentro do objeto e preenche os dados, como por exemplo 'Objeto: caminhão' caminhão.marca, caminhão.qtdPeneu
+  const handler = routes[req.method][url.pathname];
+  if (handler){
+    handler(req, res);
   }else {
     res.statusCode = 404;
-    res.end('Pagina não encontrada');
+    res.end('Não encontrado');
   }
-  console.log(req.method);
 });
 
 server.listen(3000, () => {
