@@ -1,5 +1,6 @@
 import { createServer } from "node:http";
 import { Router } from "./router.mjs";
+import { customRequest } from "./custom-request.mjs";
 
 const router = new Router();
 
@@ -13,21 +14,15 @@ router.get('/produto/notebook', (req, res) => {
 
 // Também pode ser usado dessa maneira
 function postProduto(req, res){
-  res.end('Notebook Post');
+  const cor = req.query.get("cor");
+  res.end(`Notebook Post ${cor}`);
 }
 router.post('/produto', postProduto);
 
-const server = createServer( async (req, res) => {
-  const url = new URL(req.url, 'http://localhost');
+const server = createServer( async (request, res) => {
+  const req = await customRequest(request);
   
-  const chunks = [];
-  for await (const chunk of req){
-    chunks.push(chunk);
-  }
-  const body = Buffer.concat(chunks).toString('utf-8');
-
-  // Encontra qual rota foi recebida pelo usuário
-  const handler = router.find(req.method, url.pathname);
+  const handler = router.find(req.method, req.pathname);
   if (handler){
     handler(req, res);
   }else {
