@@ -9,7 +9,7 @@ export class Router {
   }
 
   post(route, handler) {
-    this.routes["GET"][route] = handler;
+    this.routes["POST"][route] = handler;
   }
 
   find(method, route){
